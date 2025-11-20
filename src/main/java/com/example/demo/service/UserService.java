@@ -2,10 +2,11 @@ package com.example.demo.service;
 
 import com.example.demo.repository.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.dto.UserResponseDTO;
+import com.example.demo.service.mapper.UserMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,31 +16,26 @@ import java.util.Optional;
 @Slf4j // Lombok annotation for logging
 public class UserService {
 
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    //private static final Logger log = LoggerFactory.getLogger(UserService.class); no need to declare log when there is @Slf4j
     private final UserRepository userRepository;
+    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     public UserService(UserRepository userRepository) {//UserRepository Dep Inj
         this.userRepository = userRepository;
     }
 
-    public List<User> findAll(){
-        /*1. hardcoded list of Users
-        return List.of(
-                new User(1L, "Sergey", "serg@mail.ru", LocalDate.of(1990, 1, 1), 35),
-                new User(2L, "Mary", "mary@mail.ru", LocalDate.of(1991, 2, 2), 34),
-                new User(3L, "Ivan", "ivan@mail.ru", LocalDate.of(1992, 3, 3), 33)
-        );*/
-        /*2. list of Users comes from DB*/
-        return userRepository.findAll();
+    public List<UserResponseDTO> findAll(){
+        return userMapper.mapUserToUserResponseDTO(userRepository.findAll());
+        //return userRepository.findAll();
     }
 
-    public User create(User user) {
+    public UserResponseDTO create(User user) {
         log.info("Trying to create User: {}", user);
         Optional<User> optionalUser = userRepository.findByEmail(user.getEmail());
         if(optionalUser.isPresent()){
             throw new IllegalStateException("User with email: "+user.getEmail()+" already exists");
         }
-        return userRepository.save(user);
+        return userMapper.mapUserToUserResponseDTO(userRepository.save(user));
     }
 
     public void deleteUser(Long id) {
@@ -52,7 +48,7 @@ public class UserService {
     }
 
     @Transactional
-    public User updateUser(Long id, String name, String email) {
+    public UserResponseDTO updateUser(Long id, String name, String email) {
         log.info("Trying to update User with id: {}", id);
         Optional<User> optionalUser = userRepository.findById(id);
         if(optionalUser.isEmpty()){
@@ -73,6 +69,6 @@ public class UserService {
         }
 
         //userRepository.save(user); no need to save when @Transactional
-        return user;
+        return userMapper.mapUserToUserResponseDTO(user);
     }
 }

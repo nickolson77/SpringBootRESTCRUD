@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.repository.User;
 import com.example.demo.service.UserService;
+import com.example.demo.service.dto.UserResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,12 +17,12 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers(){
+    public List<UserResponseDTO> getAllUsers(){
         return userService.findAll();
     }
 
     @PostMapping // <-- click here to test POST, generate request in HTTP client(For Idea Ultimate)
-    public User createUser(@RequestBody User user){ //@RequestBody - mapping from json to User obj
+    public UserResponseDTO createUser(@RequestBody User user){ //@RequestBody - mapping from json to User obj
         return userService.create(user);
     }
     @DeleteMapping(path = "{id}")
@@ -29,7 +30,7 @@ public class UserController {
         userService.deleteUser(id);
     }
     @PutMapping(path = "{id}")
-    public User updateUser(@PathVariable Long id,
+    public UserResponseDTO updateUser(@PathVariable Long id,
                            @RequestParam(required = false) String name,
                            @RequestParam(required = false) String email) {
         return userService.updateUser(id, name, email);
