@@ -1,6 +1,6 @@
 package com.example.demo.service.mapper;
 
-import com.example.demo.repository.User;
+import com.example.demo.repository.entity.User;
 import com.example.demo.service.dto.UserResponseDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
